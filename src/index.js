@@ -1,18 +1,38 @@
-import _ from 'lodash';
+import _ from "lodash";
 
 let refs;
+let failedExpectations;
+let shouldAddMessage;
 
 // Jasmine doesn't yet have an option to fail fast. This "reporter" is a workaround for the time
 // being, making Jasmine essentially skip all tests after the first failure.
 // https://github.com/jasmine/jasmine/issues/414
 // https://github.com/juliemr/minijasminenode/issues/20
-export function init() {
+export function init(opts = { tag: null, addMessage: false }) {
   refs = getSpecReferences();
+  shouldAddMessage = opts.addMessage;
+  const tagRegex = new RegExp(opts.tag);
 
   return {
     specDone(result) {
-      if (result.status === 'failed') {
-        disableSpecs(refs);
+      if (result.status === "failed") {
+        if (opts.addMessage) {
+          failedExpectations = result.failedExpectations.map(failure => {
+            failure.message = `Marked pending because of error in "${
+              result.fullName
+            }":\n\n${failure.message}`;
+            failure.stack = `Marked pending because of error in "${
+              result.fullName
+            }":\n\n${failure.stack}`;
+            return failure;
+          });
+        }
+
+        if (opts.tag && tagRegex.test(result.description)) {
+          disableSpecs(refs);
+        }
+
+        if (!opts.tag) disableSpecs(refs);
       }
     }
   };
@@ -34,12 +54,14 @@ export function getSpecReferences() {
   };
 
   // Wrap jasmine's describe function to gather references to all suites.
-  jasmine.getEnv().describe = _.wrap(jasmine.getEnv().describe,
+  jasmine.getEnv().describe = _.wrap(
+    jasmine.getEnv().describe,
     (describe, ...args) => {
       let suite = describe.apply(null, args);
       suites.push(suite);
       return suite;
-    });
+    }
+  );
 
   return {
     specs,
@@ -54,10 +76,15 @@ export function getSpecReferences() {
  */
 export function disableSpecs() {
   if (!refs) {
-    throw new Error('jasmine-fail-fast: Must call init() before calling disableSpecs()!');
+    throw new Error(
+      "jasmine-fail-fast: Must call init() before calling disableSpecs()!"
+    );
   }
 
-  refs.specs.forEach(spec => spec.disable());
+  refs.specs.forEach(spec => {
+    if (shouldAddMessage) spec.result.failedExpectations = failedExpectations;
+    spec.disable();
+  });
 
   refs.suites.forEach(suite => {
     suite.beforeFns = [];
