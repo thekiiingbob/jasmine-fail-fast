@@ -1,22 +1,21 @@
 {
   "name": "jasmine-fail-fast",
   "version": "2.0.0",
-  "description": "Allow Jasmine tests to \"fail-fast\", exiting on the first failure instead of running all tests no matter what. ",
+  "description":
+    "Allow Jasmine tests to \"fail-fast\", exiting on the first failure instead of running all tests no matter what. theKiiingBob patch.",
   "repository": {
     "type": "git",
-    "url": "git://github.com/Updater/jasmine-fail-fast.git"
+    "url": "git://github.com/thekiiingbob/jasmine-fail-fast.git"
   },
   "main": "dist/jasmine-fail-fast.js",
   "scripts": {
     "compile": "mkdirp dist && babel -o dist/jasmine-fail-fast.js src/index.js",
     "prepublish": "npm run compile",
     "pretest": "npm run compile",
+    "postinstall": "npm run compile",
     "test": "jasmine"
   },
-  "keywords": [
-    "jasmine",
-    "fail-fast"
-  ],
+  "keywords": ["jasmine", "fail-fast"],
   "author": "patrick@updater.com",
   "license": "MIT",
   "dependencies": {
