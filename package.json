@@ -9,7 +9,8 @@
   },
   "main": "dist/jasmine-fail-fast.js",
   "scripts": {
-    "compile": "mkdirp dist && babel -o dist/jasmine-fail-fast.js src/index.js",
+    "compile":
+      "mkdirp dist && babel --presets env -o dist/jasmine-fail-fast.js src/index.js",
     "prepublish": "npm run compile",
     "pretest": "npm run compile",
     "postinstall": "npm run compile",
@@ -19,6 +20,7 @@
   "author": "patrick@updater.com",
   "license": "MIT",
   "dependencies": {
+    "babel-preset-env": "^1.7.0",
     "lodash": "3.10.0"
   },
   "devDependencies": {
