@@ -8,7 +8,9 @@ let shouldAddMessage;
 // being, making Jasmine essentially skip all tests after the first failure.
 // https://github.com/jasmine/jasmine/issues/414
 // https://github.com/juliemr/minijasminenode/issues/20
-export function init(opts = { tag: null, addMessage: false }) {
+export function init(
+  opts = { tag: null, addMessage: false, includeStack: false }
+) {
   refs = getSpecReferences();
   shouldAddMessage = opts.addMessage;
   const tagRegex = new RegExp(opts.tag);
@@ -21,9 +23,13 @@ export function init(opts = { tag: null, addMessage: false }) {
             failure.message = `Marked pending because of error in "${
               result.fullName
             }":\n\n${failure.message}`;
-            failure.stack = `Marked pending because of error in "${
-              result.fullName
-            }":\n\n${failure.stack}`;
+
+            if (opts.includeStack) {
+              failure.stack = `Marked pending because of error in "${
+                result.fullName
+              }":\n\n${failure.stack}`;
+            }
+
             return failure;
           });
         }
