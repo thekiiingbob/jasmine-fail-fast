@@ -9,7 +9,12 @@ let shouldAddMessage;
 // https://github.com/jasmine/jasmine/issues/414
 // https://github.com/juliemr/minijasminenode/issues/20
 export function init(
-  opts = { tag: null, addMessage: false, includeStack: false }
+  opts = {
+    tag: null,
+    addMessage: false,
+    includeError: false,
+    includeStack: false
+  }
 ) {
   refs = getSpecReferences();
   shouldAddMessage = opts.addMessage;
@@ -20,9 +25,11 @@ export function init(
       if (result.status === "failed") {
         if (opts.addMessage) {
           failedExpectations = result.failedExpectations.map(failure => {
-            failure.message = `Marked pending because of error in "${
-              result.fullName
-            }":\n\n${failure.message}`;
+            failure.message =
+              `Marked pending because of error in "${result.fullName}"` +
+              opts.includeError
+                ? `:\n\n${failure.message}`
+                : "";
 
             if (opts.includeStack) {
               failure.stack = `Marked pending because of error in "${
