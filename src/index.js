@@ -25,16 +25,22 @@ export function init(
       if (result.status === "failed") {
         if (opts.addMessage) {
           failedExpectations = result.failedExpectations.map(failure => {
-            failure.message =
-              `Marked pending because of error in "${result.fullName}"` +
-              opts.includeError
-                ? `:\n\n${failure.message}`
-                : "";
+            failure.message = `Marked pending because of error in "${
+              result.fullName
+            }"`;
+
+            if (opts.includeError) {
+              failure.error = failure.message + `:\n\n${failure.error}`;
+            } else {
+              failure.error = failure.message;
+            }
 
             if (opts.includeStack) {
               failure.stack = `Marked pending because of error in "${
                 result.fullName
               }":\n\n${failure.stack}`;
+            } else {
+              failure.stack = failure.message;
             }
 
             return failure;
